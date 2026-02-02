@@ -12,8 +12,8 @@ services:
      - "6000:6000"
    volumes:
      # So that Traefik can listen to the Docker events
-     - ./opt/restreamer/config:/core/config
-     - ./opt/restreamer/data:/core/data
+     - ./config:/core/config
+     - ./data:/core/data
    restart: always
    networks:
      - onstage
