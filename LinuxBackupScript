@@ -1,0 +1,61 @@
+#!/bin/bash
+###############################
+#                             #
+#   Backup to Local script.   #
+#                             #
+###############################
+
+# Source of Docker Compose Root Directory
+source_root="/docker-compose"
+
+# Where to backup to.
+dest_root="/raid30tb/subvol-100-disk-0"
+dest_folder="backup/docker"
+
+for i in `cat list-docker-backup`;do
+
+  # Create archive filename.
+  day=$(date +%Y_%m%d)
+#  hostname=$(hostname -s)
+#  archive_file="$hostname-$day-$i.tgz"
+  archive_file="$i-$day.tgz"
+  Temp_Root="root"
+  Temp_Folder="tmp"
+
+  # docker-compose stop backup docker
+  # cd $source_path && docker-compose stop
+  cd $source_root
+  cd $i
+  docker compose stop
+
+  # Print start status message.
+  echo "Backing up $source_folder to $dest_root/$dest_folder/$archive_file"
+
+  # Backup the files using tar.
+  cd /$Temp_Root
+  if [ -d $Temp_Folder ]
+  then
+    echo "$Temp_Folder Directory already exists"
+  else
+    mkdir $Temp_Folder
+  fi
+#  mkdir $Temp_Folder
+  cd $source_root
+  tar czf /$Temp_Root/$Temp_Folder/$archive_file $i/ --checkpoint=.100
+  cp /$Temp_Root/$Temp_Folder/$archive_file $dest_root/$dest_folder/
+  rm /$Temp_Root/$Temp_Folder/$archive_file
+  rmdir /$Temp_Root/$Temp_Folder
+
+  # Start Docker
+  cd $source_root
+  cd $i
+  docker compose up -d
+
+  # Print end status message.
+  echo
+  echo "Backup finished $archive_file"
+  # date
+done
+
+# Long listing of files in $dest to check file sizes.
+ls -lh $dest_root/$dest_folder
