@@ -1,0 +1,23 @@
+services:
+ app:
+   # The official v2 Traefik docker image
+   image: datarhei/restreamer:latest
+   # Enables the web UI and tells Traefik to listen to docker
+   ports:
+     # The HTTP port
+     - "8080:8080"
+     - "8181:8181"
+     - "1935:1935"
+     - "1936:1936"
+     - "6000:6000"
+   volumes:
+     # So that Traefik can listen to the Docker events
+     - ./opt/restreamer/config:/core/config
+     - ./opt/restreamer/data:/core/data
+   restart: always
+   networks:
+     - onstage
+     
+networks:
+ onstage:
+   external: true
